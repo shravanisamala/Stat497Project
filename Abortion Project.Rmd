@@ -1,0 +1,24 @@
+---
+title: "Abortion Analysis"
+author: Shravani Samala
+date: "4/2/2020 "
+output: html_document
+---
+
+# Introduction
+```{r, message=F, warning=F}
+library(ggplot2)
+library(dplyr)
+library(lmerTest)
+library(lme4)
+library(knitr)
+library(tidyverse)
+library(readr)
+
+```
+
+```{r}
+abortion <- read_csv("abortion.csv")
+head(abortion)
+```
+
