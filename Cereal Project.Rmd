@@ -37,6 +37,7 @@ myFile <- "https://raw.githubusercontent.com/MultiLevelAnalysis/Datasets-third-e
 
 data <- fread(myFile)
 
+#abortion <- read_csv(myFile)
 
 head(data)
 glimpse(data)
