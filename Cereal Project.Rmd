@@ -1,5 +1,5 @@
 ---
-title: "Abortion Analysis"
+title: "Cereal Nutrition Analysis"
 author: Shravani Samala
 date: "4/2/2020 "
 output: html_document
@@ -22,40 +22,68 @@ library(data.table)
 
 ```
 
-Introduction: 
-Five regions: West, Midwest, Southwest, Southeast, and Northeast. Randomly choose four states from each region and five counties from each state. 
-West: Oregon, Utah, Montana, and Colorado
-Midwest: Ohio, South Dakota, and Michigan
-Southwest: Arizona, New Mexico, Texas, and Oklahoma
-Southeast: Arkansas, North Carolina, Alabama, and Virginia
-Northeast: Pennsylvania, Massachusetts, Vermont, and Connecticut
+# How Healthy are the Cereals We Eat Everyday?
+As a college student, I find eating cereal to be a quick and easy breakfast before my 9 A.M. classes. My go-to cereal is Lucky Charms and sometimes I look at the nutrition label. I see all of the vitamins and minerals mentions, so I consider what I'm eating to be midly healthy. However, many of these cereals that we eat may have high amounts of sugar. The American Heart Association states that the average person should stick to around 25 - 38 grams of sugar. Although how much sugar is acceptable in cereal truly depends on each individual's own diet, many sources agree that a healthy serving of cereal should not exceed 10 grams. 
 
+Because children are shorter, their eyes may be drawn to the lower shelves of the store. It is possible that manufacturers may want their cereals to be placed somewhere closer to the bottom of the shelves so that kids would point the cereals out to their parents. Children often choose cereals with higher sugar contents than adults. Therefore, I would first like to test whether their is a correlation between shelf height and high or low sugar content. 
+
+Furthermore, as a kid, I always remember eating cereals from the Kellogs brand or General Mills brand. My parents, however, eat cereals from brands such as Quaker oats, probably due to their reduced sugar and fat contents. Therefore, the second hypothesis I would like to examine is whether or not their is a correlation between the manufacturer and the sugar and fat contents of their cereals. 
+
+The cereal data that I found on Kaggle (https://www.kaggle.com/crawford/80-cereals) contains information on 77 different cereals and their nutrition. Below is a summary of the data's variables and what they mean: 
+
+Fields in the dataset:
+
+Name: Name of cereal
+mfr: Manufacturer of cereal
+* A = American Home Food Products;
+* G = General Mills
+* K = Kelloggs
+* N = Nabisco
+* P = Post
+* Q = Quaker Oats
+* R = Ralston Purina
+
+Type: Hot and Cold cereals 
+calories: calories per serving
+protein: grams of protein
+fat: grams of fat
+sodium: milligrams of sodium
+fiber: grams of dietary fiber
+carbo: grams of complex carbohydrates
+sugars: grams of sugars
+potass: milligrams of potassium
+vitamins: vitamins and minerals - 0, 25, or 100, indicating the typical percentage of FDA recommended
+shelf: display shelf (1, 2, or 3, counting from the floor)
+weight: weight in ounces of one serving
+cups: number of cups in one serving
+rating: a rating of the cereals (Possibly from Consumer Reports?)
 
 ```{r}
 # Import data from github
-myFile <- "https://raw.githubusercontent.com/MultiLevelAnalysis/Datasets-third-edition-Multilevel-book/master/chapter%207/Safety/safety.dat"
+myFile <- "https://raw.githubusercontent.com/shravanisamala/Stat497Project/master/cereal.csv"
 
-data <- fread(myFile)
+data.cereal <- read_csv(myFile)
 
-#abortion <- read_csv(myFile)
+head(data.cereal)
+glimpse(data.cereal)
+View(data.cereal)
 
-head(data)
-glimpse(data)
-View(data)
-
-StreetData <-
-  data %>%
-  rename(street = V1,
-         personID = V2, 
-         safety = V7)
-  
-StreetData
 
 ```
 
 ```{r}
-# Clean up the data
+data.cereal <- 
+  data.cereal %>%
+  mutate(sugarHigh = ifelse(sugars > 10, 1, 0))
 
+data.cereal
+
+
+```
+
+```{r}
+model.a = lmer(sugars ~ 1 + (1|mfr) + (1|type), data=data.cereal)
+summary(model.a)
 
 ```
 
