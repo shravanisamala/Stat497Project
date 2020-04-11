@@ -19,15 +19,16 @@ library(tidyverse)
 library(readr)
 library(mosaic)
 library(data.table)
+library(VGAM)
 
 ```
 
 # How Healthy are the Cereals We Eat Everyday?
-As a college student, I find eating cereal to be a quick and easy breakfast before my 9 A.M. classes. My go-to cereal is Lucky Charms and sometimes I look at the nutrition label. I see all of the vitamins and minerals mentions, so I consider what I'm eating to be midly healthy. However, many of these cereals that we eat may have high amounts of sugar. The American Heart Association states that the average person should stick to around 25 - 38 grams of sugar. Although how much sugar is acceptable in cereal truly depends on each individual's own diet, many sources agree that a healthy serving of cereal should not exceed 10 grams. 
+As a college student, I find eating cereal to be a quick and easy breakfast before my 9 A.M. classes. My go-to cereal is Lucky Charms and sometimes I look at the nutrition label just to convince myself I am eating healthy. I see all of the vitamins and minerals mentioned, so I consider what I'm eating to be midly healthy. However, many of these cereals that we eat may have high amounts of sugar. The American Heart Association states that the average person should stick to around 25 - 38 grams of sugar. Although how much sugar is acceptable in cereal truly depends on each individual's own diet, many sources agree that a healthy serving of cereal should not exceed 10 grams. 
 
 Because children are shorter, their eyes may be drawn to the lower shelves of the store. It is possible that manufacturers may want their cereals to be placed somewhere closer to the bottom of the shelves so that kids would point the cereals out to their parents. Children often choose cereals with higher sugar contents than adults. Furthermore, many cereals for children attempt to make cereals that have a high amount of vitamins and minerals. Therefore, I would first like to test whether their is a correlation between shelf height and high or low sugar content and low, average, or high vitamin content. 
 
-Furthermore, as a kid, I always remember eating cereals from the Kellogs brand or General Mills brand. My parents, however, eat cereals from brands such as Quaker oats, probably due to their reduced sugar and fat contents. Therefore, the second hypothesis I would like to examine is whether or not their is a correlation between the manufacturer and the sugar and fat contents of their cereals. 
+Furthermore, as a kid, I always remember eating cereals from the Kellogs brand or General Mills brand. My parents, however, eat cereals from brands such as Quaker oats, probably due to their reduced sugar and fat contents. Therefore, the second hypothesis I would like to examine is whether or not their is any intercorrelation between the manufacturer and the sugar and fat contents of their cereals. 
 
 The cereal data that I found on Kaggle (https://www.kaggle.com/crawford/80-cereals) contains information on 77 different cereals and their nutrition. Below is a summary of the data's variables and what they mean:
 
@@ -76,10 +77,14 @@ View(data.cereal)
 ```{r}
 data.cereal <- 
   data.cereal %>%
-  mutate(sugarHigh = ifelse(sugars > 10, 1, 0), 
-         )
+  mutate(sugarHigh = ifelse(sugars > 10, 1, 0),
+         shelf = factor(data.cereal$shelf)) 
 
-data.cereal
+
+data.cereal$vitLevel <- vitamins ==0 
+data.cereal$vitLevel[vitamins == 0] <- "vitLow"
+data.cereal$vitLevel[vitamins == 25] <- "vitAvg"
+data.cereal$vitLevel[vitamins == 100] <- "vitHigh"
 
 
 ```
@@ -106,5 +111,21 @@ ggplot(data.cereal, aes(x=name, y=sugarHigh)) +
 model.a = lmer(sugars ~ 1 + (1|mfr) + (1|type), data=data.cereal)
 summary(model.a)
 
+```
+
+# Research Question 2: Is there any intercorrelation between the manufacturer and their cereal's sugar content? Is there any further intercorrelation between the manufacturer and their sugar content in hot and cold cereal types?
+* Not surprisingly, the two brands of cereals that I enjoyed most as a child, Kellogs and General Mills, appear to have a higher mean amount of sugar content than some of the other brands. I am surprised to see that Post had the highest amount of sugar because I only remember them as the brand that makes Raisin Bran, which has only five grams of sugar. However, after looking back at the data, Post hacing on of the highest means for sugar content makes sense, as Post also makes cereals such as Fruity Pebbles and Golden Crisp. However, the mean amount of fat content for all manufacturers appears to be relatively low around 1 gram. As for the second research question, it appears that only Nabisco and Quaker are the only two manufacturers that make both hot and cold cereals. Therefore, when testing this question, I would only allowed to be able to look at these two manufacturers; this probably will not reveal much regarding the sugar and fat difference in a manufacturer's hot and cold cereal types. 
+```{r}
+data.cereal %>%
+  group_by(mfr) %>%
+  summarise(n(),
+            mean(sugars), 
+            mean(fat))
+
+data.cereal %>%
+  group_by(mfr, type) %>%
+  summarise(n(),
+            mean(sugars), 
+            mean(fat))
 ```
 
