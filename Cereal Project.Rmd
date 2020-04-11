@@ -80,13 +80,12 @@ data.cereal <-
   mutate(sugarHigh = ifelse(sugars > 10, 1, 0),
          shelf = factor(data.cereal$shelf)) 
 
-
+attach(data.cereal)
 data.cereal$vitLevel <- vitamins ==0 
 data.cereal$vitLevel[vitamins == 0] <- "vitLow"
 data.cereal$vitLevel[vitamins == 25] <- "vitAvg"
 data.cereal$vitLevel[vitamins == 100] <- "vitHigh"
-
-
+detach(data.cereal)
 ```
 
 # Research Question 1: Is shelf height related to sugar and vitamin content?
