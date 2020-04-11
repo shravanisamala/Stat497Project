@@ -127,5 +127,18 @@ data.cereal %>%
   summarise(n(),
             mean(sugars), 
             mean(fat))
+
+ggplot(data.cereal, aes(x=mfr, y=(sugars))) + 
+  geom_point(aes(group=mfr), color="black") + ggtitle("Dot Plot of Sugar Content in Each Manufacturer")
+
+ggplot(data.cereal, aes(x=mfr, y=(sugars))) + 
+  geom_boxplot(aes(group=mfr), color="black") + ggtitle("Box Plot of Sugar Content in Each Manufacturer")
+
+ggplot(data.cereal, aes(x=mfr, y=(fat))) + 
+  geom_point(aes(group=mfr), color="black") + ggtitle("Dot Plot of Fat Content in Each Manufacturer")
+
+ggplot(data.cereal, aes(x=mfr, y=(fat))) + 
+  geom_boxplot(aes(group=mfr), color="black") + ggtitle("Box Plot of Sugar Content in Each Manufacturer")
+
 ```
 
