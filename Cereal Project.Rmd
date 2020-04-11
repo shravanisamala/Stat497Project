@@ -25,13 +25,13 @@ library(data.table)
 # How Healthy are the Cereals We Eat Everyday?
 As a college student, I find eating cereal to be a quick and easy breakfast before my 9 A.M. classes. My go-to cereal is Lucky Charms and sometimes I look at the nutrition label. I see all of the vitamins and minerals mentions, so I consider what I'm eating to be midly healthy. However, many of these cereals that we eat may have high amounts of sugar. The American Heart Association states that the average person should stick to around 25 - 38 grams of sugar. Although how much sugar is acceptable in cereal truly depends on each individual's own diet, many sources agree that a healthy serving of cereal should not exceed 10 grams. 
 
-Because children are shorter, their eyes may be drawn to the lower shelves of the store. It is possible that manufacturers may want their cereals to be placed somewhere closer to the bottom of the shelves so that kids would point the cereals out to their parents. Children often choose cereals with higher sugar contents than adults. Therefore, I would first like to test whether their is a correlation between shelf height and high or low sugar content. 
+Because children are shorter, their eyes may be drawn to the lower shelves of the store. It is possible that manufacturers may want their cereals to be placed somewhere closer to the bottom of the shelves so that kids would point the cereals out to their parents. Children often choose cereals with higher sugar contents than adults. Furthermore, many cereals for children attempt to make cereals that have a high amount of vitamins and minerals. Therefore, I would first like to test whether their is a correlation between shelf height and high or low sugar content and low, average, or high vitamin content. 
 
 Furthermore, as a kid, I always remember eating cereals from the Kellogs brand or General Mills brand. My parents, however, eat cereals from brands such as Quaker oats, probably due to their reduced sugar and fat contents. Therefore, the second hypothesis I would like to examine is whether or not their is a correlation between the manufacturer and the sugar and fat contents of their cereals. 
 
-The cereal data that I found on Kaggle (https://www.kaggle.com/crawford/80-cereals) contains information on 77 different cereals and their nutrition. Below is a summary of the data's variables and what they mean: 
+The cereal data that I found on Kaggle (https://www.kaggle.com/crawford/80-cereals) contains information on 77 different cereals and their nutrition. Below is a summary of the data's variables and what they mean:
 
-Fields in the dataset:
+Variables in the dataset:
 
 Name: Name of cereal
 mfr: Manufacturer of cereal
@@ -58,6 +58,7 @@ weight: weight in ounces of one serving
 cups: number of cups in one serving
 rating: a rating of the cereals (Possibly from Consumer Reports?)
 
+# Importing the Data
 ```{r}
 # Import data from github
 myFile <- "https://raw.githubusercontent.com/shravanisamala/Stat497Project/master/cereal.csv"
@@ -71,14 +72,34 @@ View(data.cereal)
 
 ```
 
+# Cleaning and Creating New Variables
 ```{r}
 data.cereal <- 
   data.cereal %>%
-  mutate(sugarHigh = ifelse(sugars > 10, 1, 0))
+  mutate(sugarHigh = ifelse(sugars > 10, 1, 0), 
+         )
 
 data.cereal
 
 
+```
+
+# Research Question 1: Is shelf height related to sugar and vitamin content?
+First, let's do some EDA
+```{r}
+data.cereal %>%
+  group_by(shelf) %>%
+  summarise(n(),
+            mean(sugars), 
+            mean(vitamins))
+              
+ggplot(data.cereal, aes(x=name, y=sugars)) + 
+  geom_point(aes(group=shelf), color="black") +
+  facet_wrap(~shelf, ncol=7) 
+
+ggplot(data.cereal, aes(x=name, y=sugarHigh)) + 
+  geom_point(aes(group=shelf), color="black") +
+  facet_wrap(~shelf, ncol=7) 
 ```
 
 ```{r}
