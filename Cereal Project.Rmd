@@ -88,8 +88,8 @@ data.cereal$vitLevel[vitamins == 100] <- "vitHigh"
 detach(data.cereal)
 ```
 
-# Research Question 1: Is shelf height related to sugar and vitamin content?
-First, let's do some EDA
+# Research Question 1: Is shelf height related to sugar and vitamin content? What are the odds that cereals on the second shelf have high sugar content. 
+* After looing at the mean sugar content of the cereals on each shelf, we can see that the second shelf had the highest mean sugar content of 9.619 grams, as suspected. However, it had the second highest vitamin content of 23.809 percentage of what the FDA recommends. I also wanted to see if a few other variables could have an effect on whether or not a cereal has high or low sugar content. It does appear that calories and fiber have a relationship with the level of sugar in a cereal, but potassium does not appear to play much of a part in determining whether or not a cereal has high or low sugar levels. Other nutritional variables such as these will be testing later on. 
 ```{r}
 data.cereal %>%
   group_by(shelf) %>%
@@ -99,17 +99,24 @@ data.cereal %>%
               
 ggplot(data.cereal, aes(x=name, y=sugars)) + 
   geom_point(aes(group=shelf), color="black") +
-  facet_wrap(~shelf, ncol=7) 
+  facet_wrap(~shelf, ncol=7) + ggtitle("Sugar Content in Each Cereal, Separated by Shelf")
 
 ggplot(data.cereal, aes(x=name, y=sugarHigh)) + 
   geom_point(aes(group=shelf), color="black") +
-  facet_wrap(~shelf, ncol=7) 
-```
+  facet_wrap(~shelf, ncol=7) + ggtitle("High(1) vs. Low(0) Sugar Content in Each Cereal, Separated by Shelf")
 
-```{r}
-model.a = lmer(sugars ~ 1 + (1|mfr) + (1|type), data=data.cereal)
-summary(model.a)
+# Testing to see what other variables may be related to sugar content
+ggplot(data.cereal, aes(x=vitamins, y=sugarHigh)) + 
+  geom_point(aes(color="black")) + ggtitle("Vitamins and Sugar Content in Cereal")
 
+ggplot(data.cereal, aes(x=calories, y=sugarHigh)) + 
+  geom_point(aes(color="black")) + ggtitle("Calories and Sugar Content n Cereal")
+
+ggplot(data.cereal, aes(x=potass, y=sugarHigh)) + 
+  geom_point(aes(color="black")) + ggtitle("Potassium and Sugar Content n Cereal")
+
+ggplot(data.cereal, aes(x=fiber, y=sugarHigh)) + 
+  geom_point(aes(color="black")) + ggtitle("Fiber and Sugar Content n Cereal")
 ```
 
 # Research Question 2: Is there any intercorrelation between the manufacturer and their cereal's sugar content? Is there any further intercorrelation between the manufacturer and their sugar content in hot and cold cereal types?
