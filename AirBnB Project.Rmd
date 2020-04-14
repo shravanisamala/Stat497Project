@@ -62,6 +62,15 @@ View(AirBnb.data)
 
 # Research Question 1: What variables contribute to a customer's overall satisfaction with a hotel? 
 ```{r}
+AirBnb.data %>%
+  group_by(satisfaction) %>%
+  summarise(mean(bedrooms), 
+            mean(accommodates), 
+            mean(price), 
+            mean(minstay), 
+            mean(WalkScore), 
+            mean(TransitScore), 
+            mean(BikeScore))
 
 ggplot(AirBnb.data, aes(x = satisfaction, y = bedrooms)) + geom_boxplot(color = "black") + coord_flip()
 ggplot(AirBnb.data, aes(x = satisfaction, y = accommodates)) + geom_boxplot(color = "black") + coord_flip()
@@ -72,18 +81,51 @@ ggplot(AirBnb.data, aes(x = satisfaction, y = TransitScore)) + geom_boxplot(colo
 ggplot(AirBnb.data, aes(x = satisfaction, y = BikeScore)) + geom_boxplot(color = "black") + coord_flip()
 
 
-
-
-
-
-```
 ```
 
-Are the number of bedrooms and the number of people a hotel can accomodate relate to the odds of a hotel having a high price?
+
 ```{r}
-model.PriceHigh <- glm(priceHigh ~ bedrooms + accomodates + , family = binomial, data = data.cereal)
-summary(mod.HighSugar)
+
+# Bedtooms
+bedModel <- glm(satisfaction ~ bedrooms, family = "binomial", data = AirBnb.data)
+summary(bedModel)
+
+# Accomodations
+accModel <- glm(satisfaction ~ accommodates, family = "binomial", data = AirBnb.data)
+summary(accModel)
+
+# Price
+priceModel <- glm(satisfaction ~ price, family = "binomial", data = AirBnb.data)
+summary(priceModel)
+
+# Minimum stay
+minstayModel <- glm(satisfaction ~ minstay, family = "binomial", data = AirBnb.data)
+summary(minstayModel)
+
+# Walk Score
+minstayModel <- glm(satisfaction ~ WalkScore, family = "binomial", data = AirBnb.data)
+summary(minstayModel)
+
+# Transit Score
+minstayModel <- glm(satisfaction ~ TransitScore, family = "binomial", data = AirBnb.data)
+summary(minstayModel)
+
+# Bike Score
+minstayModel <- glm(satisfaction ~ BikeScore, family = "binomial", data = AirBnb.data)
+summary(minstayModel)
+
 ```
+
+```{r}
+#Full Model 
+fullModel <- glm(satisfaction ~ (accommodates + price + WalkScore)^2, family = "binomial", data = AirBnb.data)
+
+fullFinalModel <- step(fullModel, direction = "backward")
+summary(fullFinalModel)
+```
+
+# Research Question 2: 
+
 
 ```{r}
 modelA <- lmer(price ~ 1 + (1|neighborhood), data = AirBnb.data)
