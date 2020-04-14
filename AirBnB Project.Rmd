@@ -60,7 +60,8 @@ glimpse(AirBnb.data)
 View(AirBnb.data)
 ```
 
-# Research Question 1: What variables contribute to a customer's overall satisfaction with a hotel? 
+# Research Question 1: What variables contribute to a customer's complete satisfaction with a hotel? 
+As seen in the summary statistics, the mean bedrooms, number fo people the unit accommodates, price, Walk score, Transit score, and Bike Score for being completely satisfied (satisfaction = 1) and not completely satsified (satisfaction = 0) are all very similar. The only one that looks significantly different is the price of the unit. After looking at the boxplots, the means for bedrooms, transit score, and bike score appear to be very similar and the means for number of people the unit accommodates, price, and walk score look different. Therefore, I will fit a logistic model to each of these variables to see if they are significant in predicting the odds of whether of not a customer is completely satisfied. 
 ```{r}
 AirBnb.data %>%
   group_by(satisfaction) %>%
@@ -124,8 +125,15 @@ fullFinalModel <- step(fullModel, direction = "backward")
 summary(fullFinalModel)
 ```
 
-# Research Question 2: 
+```{r}
+redFinalModel <- glm(satisfaction ~ accommodates + price + WalkScore, family = "binomial", data = AirBnb.data)
+summary(redFinalModel)
 
+lrtest(fullFinalModel, redFinalModel)
+```
+
+
+# Research Question 2: To what extent do hotels within the same neighborhood have similar prices?
 
 ```{r}
 modelA <- lmer(price ~ 1 + (1|neighborhood), data = AirBnb.data)
