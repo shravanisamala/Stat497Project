@@ -11,6 +11,8 @@ output: html_document
 rm(list = ls()) #clear the workspace
 
 library(ggplot2)
+library(ggformula)
+library(corrplot)
 library(dplyr)
 library(lmerTest)
 library(lme4)
@@ -20,15 +22,14 @@ library(readr)
 library(mosaic)
 library(data.table)
 library(VGAM)
+library(lmtest)
 
 ```
 
 # How Healthy are the Cereals We Eat Everyday?
 As a college student, I find eating cereal to be a quick and easy breakfast before my 9 A.M. classes. My go-to cereal is Lucky Charms and sometimes I look at the nutrition label just to convince myself I am eating healthy. I see all of the vitamins and minerals mentioned, so I consider what I'm eating to be midly healthy. However, many of these cereals that we eat may have high amounts of sugar. The American Heart Association states that the average person should stick to around 25 - 38 grams of sugar. Although how much sugar is acceptable in cereal truly depends on each individual's own diet, many sources agree that a healthy serving of cereal should not exceed 10 grams. 
 
-Because children are shorter, their eyes may be drawn to the lower shelves of the store. It is possible that manufacturers may want their cereals to be placed somewhere closer to the bottom of the shelves so that kids would point the cereals out to their parents. Children often choose cereals with higher sugar contents than adults. Furthermore, many cereals for children attempt to make cereals that have a high amount of vitamins and minerals. Therefore, I would first like to test whether their is a correlation between shelf height and high or low sugar content and low, average, or high vitamin content. 
-
-Furthermore, as a kid, I always remember eating cereals from the Kellogs brand or General Mills brand. My parents, however, eat cereals from brands such as Quaker oats, probably due to their reduced sugar and fat contents. Therefore, the second hypothesis I would like to examine is whether or not their is any intercorrelation between the manufacturer and the sugar and fat contents of their cereals. 
+Because children are shorter, their eyes may be drawn to the lower shelves of the store. It is possible that manufacturers may want their cereals to be placed somewhere closer to the bottom of the shelves so that kids would point the cereals out to their parents. Children often choose cereals with higher sugar contents than adults. Many cereals for children attempt to make cereals that have a high amount of vitamins and minerals. There are many more nutritional facts provided in this data set, so I would like to see what their roles are in determining if a cereal has high or low sugar content, or if they have none at all.
 
 The cereal data that I found on Kaggle (https://www.kaggle.com/crawford/80-cereals) contains information on 77 different cereals and their nutrition. Below is a summary of the data's variables and what they mean:
 
@@ -36,12 +37,18 @@ Variables in the dataset:
 
 Name: Name of cereal
 mfr: Manufacturer of cereal
-* A = American Home Food Products;
+* A = American Home Food Products
+
 * G = General Mills
+
 * K = Kelloggs
+
 * N = Nabisco
+
 * P = Post
+
 * Q = Quaker Oats
+
 * R = Ralston Purina
 
 Type: Hot and Cold cereals 
@@ -68,13 +75,14 @@ data.cereal <- read_csv(myFile)
 
 head(data.cereal)
 glimpse(data.cereal)
-View(data.cereal)
+#View(data.cereal)
 
 
 ```
 
 # Cleaning and Creating New Variables
 ```{r}
+
 data.cereal <- 
   data.cereal %>%
   mutate(sugarHigh = ifelse(sugars > 10, 1, 0),
@@ -86,10 +94,18 @@ data.cereal$vitLevel[vitamins == 0] <- "vitLow"
 data.cereal$vitLevel[vitamins == 25] <- "vitAvg"
 data.cereal$vitLevel[vitamins == 100] <- "vitHigh"
 detach(data.cereal)
+
+#Looking through the data, I see some negative values. So I will remove those and just replacce them with NA
+data.cereal$carbo[data.cereal$carbo < 0] <- NA
+data.cereal$sugars[data.cereal$sugars < 0] <- NA
+data.cereal$potass[data.cereal$potass < 0] <- NA
+
 ```
 
-# Research Question 1: Is shelf height related to sugar and vitamin content? What are the odds that cereals on the second shelf have high sugar content. 
-* After looing at the mean sugar content of the cereals on each shelf, we can see that the second shelf had the highest mean sugar content of 9.619 grams, as suspected. However, it had the second highest vitamin content of 23.809 percentage of what the FDA recommends. I also wanted to see if a few other variables could have an effect on whether or not a cereal has high or low sugar content. It does appear that calories and fiber have a relationship with the level of sugar in a cereal, but potassium does not appear to play much of a part in determining whether or not a cereal has high or low sugar levels. Other nutritional variables such as these will be testing later on. 
+# Research Question 1: Is shelf height related to sugar and vitamin content? What other variables are related to high and low sugar content in cereals?
+
+### Exploratory Data Analysis
+* After looking at the mean sugar content of the cereals on each shelf, we can see that the second shelf had the highest mean sugar content of 9.619 grams, as suspected. However, it had the second highest vitamin content of 23.809 percentage of what the FDA recommends. I also wanted to see if a few other variables could have an effect on whether or not a cereal has high or low sugar content. It does appear that calories and fiber have a relationship with the level of sugar in a cereal, but potassium does not appear to play much of a part in determining whether or not a cereal has high or low sugar levels. Other nutritional variables such as these will be testing later on. 
 ```{r}
 data.cereal %>%
   group_by(shelf) %>%
@@ -105,6 +121,14 @@ ggplot(data.cereal, aes(x=name, y=sugarHigh)) +
   geom_point(aes(group=shelf), color="black") +
   facet_wrap(~shelf, ncol=7) + ggtitle("High(1) vs. Low(0) Sugar Content in Each Cereal, Separated by Shelf")
 
+ggplot(data.cereal, aes(x=name, y=vitamins)) + 
+  geom_point(aes(group=shelf), color="black") +
+  facet_wrap(~shelf, ncol=7) + ggtitle("Vitamin Content in Each Cereal, Separated by Shelf")
+
+ggplot(data.cereal, aes(x=name, y=vitLevel)) + 
+  geom_point(aes(group=shelf), color="black") +
+  facet_wrap(~shelf, ncol=7) + ggtitle("Low, Average, and Low Vitamin Content in Each Cereal, Separated by Shelf")
+
 # Testing to see what other variables may be related to sugar content
 ggplot(data.cereal, aes(x=vitamins, y=sugarHigh)) + 
   geom_point(aes(color="black")) + ggtitle("Vitamins and Sugar Content in Cereal")
@@ -117,7 +141,25 @@ ggplot(data.cereal, aes(x=potass, y=sugarHigh)) +
 
 ggplot(data.cereal, aes(x=fiber, y=sugarHigh)) + 
   geom_point(aes(color="black")) + ggtitle("Fiber and Sugar Content n Cereal")
+
 ```
+
+### Creating and Testing Models for Research Question 1
+```{r}
+data.cereal
+mod.HighSugar <- glm(sugarHigh ~ shelf, family = binomial, data = data.cereal)
+summary(mod.HighSugar)
+
+mod.HighSugarAll <- mod.HighSugar <- glm(sugarHigh ~ calories + protein + fat + sodium + fiber + carbo + potass + vitamins + cups + rating, family = binomial, data = data.cereal)
+summary(mod.HighSugar)
+ 
+mod.vitLev <- vglm(vitLevel ~ shelf, family = multinomial(), data = data.cereal)
+summary(mod.HighSugar) 
+
+mod.vitLevAll <- vglm(vitLevel ~ , family = multinomial(), data = data.cereal)
+summary(mod.HighSugar) 
+```
+
 
 # Research Question 2: Is there any intercorrelation between the manufacturer and their cereal's sugar content? Is there any further intercorrelation between the manufacturer and their sugar content in hot and cold cereal types?
 * Not surprisingly, the two brands of cereals that I enjoyed most as a child, Kellogs and General Mills, appear to have a higher mean amount of sugar content than some of the other brands. I am surprised to see that Post had the highest amount of sugar because I only remember them as the brand that makes Raisin Bran, which has only five grams of sugar. However, after looking back at the data, Post hacing on of the highest means for sugar content makes sense, as Post also makes cereals such as Fruity Pebbles and Golden Crisp. However, the mean amount of fat content for all manufacturers appears to be relatively low around 1 gram. As for the second research question, it appears that only Nabisco and Quaker are the only two manufacturers that make both hot and cold cereals. Therefore, when testing this question, I would only allowed to be able to look at these two manufacturers; this probably will not reveal much regarding the sugar and fat difference in a manufacturer's hot and cold cereal types. 
@@ -147,4 +189,36 @@ ggplot(data.cereal, aes(x=mfr, y=(fat))) +
   geom_boxplot(aes(group=mfr), color="black") + ggtitle("Box Plot of Sugar Content in Each Manufacturer")
 
 ```
+
+### Creating and Testing Models for Research Question 2
+```{r}
+modelA <- lmer(sugars ~ 1 + (1|name), data = data.cereal)
+summary(modelA)
+```
+
+```{r}
+myFile2 <- "https://raw.githubusercontent.com/proback/BYSH/master/data/airbnb.csv"
+AirBnb.data <- read_csv(myFile2)
+
+AirBnb.data<-
+AirBnb.data%>%
+  rename(hotelID = X1)
+
+head(AirBnb.data)
+View(AirBnb.data)
+```
+
+```{r}
+modelA <- lmer(price ~ 1 + (1|neighborhood), data = AirBnb.data)
+summary(modelA)
+
+```
+
+
+
+
+
+
+
+
 

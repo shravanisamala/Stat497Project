@@ -1,0 +1,70 @@
+---
+title: "Air BnB Data Analysis"
+author: Shravani Samala
+date: "4/2/2020 "
+output: html_document
+---
+
+# Introduction
+```{r, message=F, warning=F}
+# front-matter
+rm(list = ls()) #clear the workspace
+
+library(ggplot2)
+library(ggformula)
+library(corrplot)
+library(dplyr)
+library(lmerTest)
+library(lme4)
+library(knitr)
+library(tidyverse)
+library(readr)
+library(mosaic)
+library(data.table)
+library(VGAM)
+library(lmtest)
+
+```
+
+*overall_satisfaction = rating on a 0-5 scale.
+*satisfaction = 1 if overall_satisfaction is 5, 0 otherwise
+*price = price for one night (in dollars)
+*reviews = number of reviews posted
+*room_type = Entire home/apt, Private room, or Shared room
+*accommodates = number of people the unit can hold
+*bedrooms = number of bedrooms
+*minstay = minimum length of stay (in days)
+*neighborhood = neighborhood where unit is located (1 of 43)
+*district = district where unit is located (1 of 9)
+*WalkScore = quality of the neighborhood for walking (0-100)
+*TransitScore = quality of the neighborhood for public transit (0-100)
+*BikeScore = quality of the neighborhood for biking (0-100)
+*PctBlack = proportion of black residents in a neighborhood
+*HighBlack = 1 if PctBlack above .60, 0 otherwise
+```{r}
+myFile2 <- "https://raw.githubusercontent.com/proback/BYSH/master/data/airbnb.csv"
+AirBnb.data <- read_csv(myFile2)
+
+head(AirBnb.data)
+```
+
+```{r}
+AirBnb.data<-
+AirBnb.data%>%
+  rename(hotelID = X1)%>%
+  mutate(priceHigh = factor(ifelse(price >= 100,1,0)), 
+         )
+head(AirBnb.data)
+```
+
+Are the number of bedrooms and the number of people a hotel can accomodate relate to the odds of a hotel having a high price?
+```{r}
+model.PriceHigh <- glm(priceHigh ~ bedrooms + accomodates + , family = binomial, data = data.cereal)
+summary(mod.HighSugar)
+```
+
+```{r}
+modelA <- lmer(price ~ 1 + (1|neighborhood), data = AirBnb.data)
+summary(modelA)
+
+```
