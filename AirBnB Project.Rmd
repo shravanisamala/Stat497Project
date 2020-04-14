@@ -5,7 +5,6 @@ date: "4/2/2020 "
 output: html_document
 ---
 
-# Introduction
 ```{r, message=F, warning=F}
 # front-matter
 rm(list = ls()) #clear the workspace
@@ -25,6 +24,7 @@ library(VGAM)
 library(lmtest)
 
 ```
+# Introduction
 
 *overall_satisfaction = rating on a 0-5 scale.
 *satisfaction = 1 if overall_satisfaction is 5, 0 otherwise
@@ -48,13 +48,35 @@ AirBnb.data <- read_csv(myFile2)
 head(AirBnb.data)
 ```
 
+
 ```{r}
 AirBnb.data<-
 AirBnb.data%>%
   rename(hotelID = X1)%>%
-  mutate(priceHigh = factor(ifelse(price >= 100,1,0)), 
-         )
+  mutate(priceHigh = factor(ifelse(price >= 100,1,0)),
+         satisfaction = factor(ifelse(overall_satisfaction == 5.0, 1, 0))) # 1 means high price, 0 means low price
 head(AirBnb.data)
+glimpse(AirBnb.data)
+View(AirBnb.data)
+```
+
+# Research Question 1: What variables contribute to a customer's overall satisfaction with a hotel? 
+```{r}
+
+ggplot(AirBnb.data, aes(x = satisfaction, y = bedrooms)) + geom_boxplot(color = "black") + coord_flip()
+ggplot(AirBnb.data, aes(x = satisfaction, y = accommodates)) + geom_boxplot(color = "black") + coord_flip()
+ggplot(AirBnb.data, aes(x = satisfaction, y = price)) + geom_boxplot(color = "black") + coord_flip()
+ggplot(AirBnb.data, aes(x = satisfaction, y = minstay)) + geom_boxplot(color = "black") + coord_flip()
+ggplot(AirBnb.data, aes(x = satisfaction, y = WalkScore)) + geom_boxplot(color = "black") + coord_flip()
+ggplot(AirBnb.data, aes(x = satisfaction, y = TransitScore)) + geom_boxplot(color = "black") + coord_flip()
+ggplot(AirBnb.data, aes(x = satisfaction, y = BikeScore)) + geom_boxplot(color = "black") + coord_flip()
+
+
+
+
+
+
+```
 ```
 
 Are the number of bedrooms and the number of people a hotel can accomodate relate to the odds of a hotel having a high price?
