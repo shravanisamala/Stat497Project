@@ -60,13 +60,15 @@ head(AirBnb.data)
 ```{r}
 AirBnb.data<-
 AirBnb.data%>%
-  rename(hotelID = X1)%>%
+  rename(ID = X1)%>%
   mutate(priceHigh = factor(ifelse(price >= 120,1,0)), # 1 means high price, 0 means low price
         satisfaction = factor(ifelse(overall_satisfaction == 5.0, 1, 0)),
         entire = factor(ifelse(room_type == "Entire home/apt", 1, 0)), 
         private = factor(ifelse(room_type == "Private room", 1, 0)),
         shared = factor(ifelse(room_type == "Shared room", 1, 0)),
-        HighBlack = factor(ifelse(PctBlack > 0.60, 1, 0)))
+        HighBlack = factor(ifelse(PctBlack > 0.60, 1, 0)),
+        HighRev= factor(ifelse(reviews >= 100, 1, 0)))
+
 
 head(AirBnb.data)
 glimpse(AirBnb.data)
@@ -167,13 +169,17 @@ $\beta_0$ = -1.7094179 --> 0.1809711; the estimated odds of being completely sat
 $\beta_1$ = -1.0877718 --> 0.3369664; the estimated decrease in odds of the customer being completely satisfied with their stay for every one-unit increase in accommodates is 0.3369664, holding all other variables at a fixed value. 
 $\beta_2$ = 0.0592719 --> 1.0610637; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in price is 1.0610637, holding all other variables at a fixed value.
 $\beta_3$ = 0.0268196 --> 1.0285972; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in WalkScore is 1.0285972, holding all other variables at a fixed value.
-$\beta_4$ = 0.0099619 --> 1.0100116
-$\beta_5$ = -0.0006085 --> 0.9993916
+$\beta_4$ = 0.0099619 --> 1.0100116; For every one-unit increase in acommodations, the effect of an additional unit of WalkScore will increase the odds of a customer being completely satisfied by 1.0100116. 
+$\beta_5$ = -0.0006085 --> 0.9993916; For every one-unit increase in price, the effect of an additional unit of WalkSCore will increase the odds of a customer being completely satisfied by 1.0100116. 
 
-# Research Question 2: To what extent do hotels within the same neighborhood have similar prices?
+# Research Question 2: When renting an Air BnB, what variables will affect the price of the unit you choose?
 ### EDA
 * Level 1 (price) predictors: overall_satisfaction, satisfaction, reviews, room_type, accommodates, bedrooms, minstay
 * Level 2 (neighborhood) predictors: district, WalkScore, TransitScore, BikeScore, PctBlack, and HighBlack
+* Fixed effects: HighBlack, 
+* Random effects: the neighborhood of each Air Bnb
+
+* The summary statistics give show us that variables such as WalkScore, TransitScore, and BikeScore all vary from neighborhood to neighborhood. When testing these variables in the model, we will be ale to see how they affect the price of the units. 
 
 * As seen in the dot plots, the overall pattern for each neighborhood appears to be that shared rooms are the lowest in price, private rooms are more expensive than shared rooms, but less expensive that entire homes (which are the most expensive). 
 ```{r fig.height=10, fig.width=7}
@@ -182,7 +188,8 @@ AirBnb.data %>%
   group_by(neighborhood) %>%
   summarise(mean(price),
             mean(WalkScore), 
-            mean(TransitScore), 
+            mean(TransitScore),
+            mean(BikeScore), 
             mean(PctBlack),
             mean(overall_satisfaction), 
             mean(accommodates), 
@@ -208,6 +215,9 @@ ggplot(data=AirBnb.data, aes(x=HighBlack,y=price)) +
 ```{r fig.height=10, fig.width=7}
 ggplot(data=AirBnb.data, aes(x= HighBlack,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) + ggtitle("HighBlack vs. Price")
 ```
+
+### ### Fitting the Models for Research Question 2
+
 
 ```{r}
 modelA <- lmer(price ~ 1 + (1|neighborhood), data = AirBnb.data)
