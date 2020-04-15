@@ -26,8 +26,8 @@ library(lmtest)
 ```
 # Introduction
 
+Variables included in data: 
 *overall_satisfaction = rating on a 0-5 scale.
-*satisfaction = 1 if overall_satisfaction is 5, 0 otherwise
 *price = price for one night (in dollars)
 *reviews = number of reviews posted
 *room_type = Entire home/apt, Private room, or Shared room
@@ -41,6 +41,14 @@ library(lmtest)
 *BikeScore = quality of the neighborhood for biking (0-100)
 *PctBlack = proportion of black residents in a neighborhood
 *HighBlack = 1 if PctBlack above .60, 0 otherwise
+
+Variables created: 
+*satisfaction = 1 if overall_satisfaction is 5, 0 otherwise
+*priceHigh = 1 if price is greater than or equal to 120, 0 otherwise
+*entire = 1 if room_type is Entire home/apt, 0 otherwise
+*private = 1 if room_type is Private room, 0 otherwise
+*shared = 1 if room_type is Shared room, 0 otherwise
+
 ```{r}
 myFile2 <- "https://raw.githubusercontent.com/proback/BYSH/master/data/airbnb.csv"
 AirBnb.data <- read_csv(myFile2)
@@ -53,15 +61,21 @@ head(AirBnb.data)
 AirBnb.data<-
 AirBnb.data%>%
   rename(hotelID = X1)%>%
-  mutate(priceHigh = factor(ifelse(price >= 100,1,0)),
-         satisfaction = factor(ifelse(overall_satisfaction == 5.0, 1, 0))) # 1 means high price, 0 means low price
+  mutate(priceHigh = factor(ifelse(price >= 120,1,0)), # 1 means high price, 0 means low price
+        satisfaction = factor(ifelse(overall_satisfaction == 5.0, 1, 0)),
+        entire = factor(ifelse(room_type == "Entire home/apt", 1, 0)), 
+        private = factor(ifelse(room_type == "Private room", 1, 0)),
+        shared = factor(ifelse(room_type == "Shared room", 1, 0)),
+        HighBlack = factor(ifelse(PctBlack > 0.60, 1, 0)))
+
 head(AirBnb.data)
 glimpse(AirBnb.data)
-View(AirBnb.data)
+
 ```
 
 # Research Question 1: What variables contribute to a customer's complete satisfaction with a hotel? 
-As seen in the summary statistics, the mean bedrooms, number fo people the unit accommodates, price, Walk score, Transit score, and Bike Score for being completely satisfied (satisfaction = 1) and not completely satsified (satisfaction = 0) are all very similar. The only one that looks significantly different is the price of the unit. After looking at the boxplots, the means for bedrooms, transit score, and bike score appear to be very similar and the means for number of people the unit accommodates, price, and walk score look different. Therefore, I will fit a logistic model to each of these variables to see if they are significant in predicting the odds of whether of not a customer is completely satisfied. 
+### EDA
+As seen in the summary statistics, the mean bedrooms, number for people the unit accommodates, price, Walk score, Transit score, and Bike Score for being completely satisfied (satisfaction = 1) and not completely satsified (satisfaction = 0) are all very similar. The only one that looks significantly different is the price of the unit. After looking at the boxplots, the means for bedrooms, transit score, and bike score appear to be very similar and the means for number of people the unit accommodates, price, and walk score look different. Therefore, I will fit a logistic model to each of these variables to see if they are significant in predicting the odds of whether of not a customer is completely satisfied. 
 ```{r}
 AirBnb.data %>%
   group_by(satisfaction) %>%
@@ -84,6 +98,10 @@ ggplot(AirBnb.data, aes(x = satisfaction, y = BikeScore)) + geom_boxplot(color =
 
 ```
 
+### Fitting the Models for Research Question 1
+* First I tested each variable (bedrooms, accommodates, price, minstay, WalkScore, TransitScore and BikeScore) to see if they were significant in predicting the odds that a customer is satisfied with their stay at their hotel. After fitting each model, it appeared that the significant variables were accommodates, price and WalkScore. Then, I decided to create a full model which would contain the additive model of the significant variables as well as their interactions. After the backwards elimination process, the full final model turned out to be: 
+
+\[log(pi/(1−pi)) = \beta_0 + \beta_1(accommodates) + \beta_2(price) + \beta_3(WalkScore) + \beta_4(accommodates*WalkScore) + \beta_5(price*WalkScore)\]
 
 ```{r}
 
@@ -125,15 +143,71 @@ fullFinalModel <- step(fullModel, direction = "backward")
 summary(fullFinalModel)
 ```
 
+* Given that this is a somewhat complicate model with six parameter, two of which include an interaction between two variables, I wanted to test if the additive model would be sufficient in predicting the odds that the customer would be satisfied with their stay. 
+
+* Therefore: 
+
+\[H_0: log(pi/(1−pi)) = \beta_0 + \beta_1(accommodates) + \beta_2(price) + \beta_3(WalkScore)\]
+\[H_a: log(pi/(1−pi)) = \beta_0 + \beta_1(accommodates) + \beta_2(price) + \beta_3(WalkScore) + \beta_4(accommodates*WalkScore) + \beta_5(price*WalkScore)\]
+
+* The results of the likelihood ratio test were as follows: 
+The LRT test statistic is 10.847 and the p-value is 0.004411. Because the p-value of 0.004411 is less than $\alpha$ = 0.05, we can reject the null and say that the interactions terms are significant in this model and should not be removed. 
 ```{r}
 redFinalModel <- glm(satisfaction ~ accommodates + price + WalkScore, family = "binomial", data = AirBnb.data)
-summary(redFinalModel)
 
 lrtest(fullFinalModel, redFinalModel)
 ```
 
+* Therefore, the final model remains: 
+
+\[log(pi/(1−pi)) = \beta_0 + \beta_1(accommodates) + \beta_2(price) + \beta_3(WalkScore) + \beta_4(accommodates*WalkScore) + \beta_5(price*WalkScore)\]
+
+* Interpretations: (log odds --> odds($e$ raised to each parameter))
+$\beta_0$ = -1.7094179 --> 0.1809711; the estimated odds of being completely satisfied (satisfaction = 1) is 0.1809711.  
+$\beta_1$ = -1.0877718 --> 0.3369664; the estimated decrease in odds of the customer being completely satisfied with their stay for every one-unit increase in accommodates is 0.3369664, holding all other variables at a fixed value. 
+$\beta_2$ = 0.0592719 --> 1.0610637; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in price is 1.0610637, holding all other variables at a fixed value.
+$\beta_3$ = 0.0268196 --> 1.0285972; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in WalkScore is 1.0285972, holding all other variables at a fixed value.
+$\beta_4$ = 0.0099619 --> 1.0100116
+$\beta_5$ = -0.0006085 --> 0.9993916
 
 # Research Question 2: To what extent do hotels within the same neighborhood have similar prices?
+### EDA
+* Level 1 (price) predictors: overall_satisfaction, satisfaction, reviews, room_type, accommodates, bedrooms, minstay
+* Level 2 (neighborhood) predictors: district, WalkScore, TransitScore, BikeScore, PctBlack, and HighBlack
+
+* As seen in the dot plots, the overall pattern for each neighborhood appears to be that shared rooms are the lowest in price, private rooms are more expensive than shared rooms, but less expensive that entire homes (which are the most expensive). 
+```{r fig.height=10, fig.width=7}
+
+AirBnb.data %>%
+  group_by(neighborhood) %>%
+  summarise(mean(price),
+            mean(WalkScore), 
+            mean(TransitScore), 
+            mean(PctBlack),
+            mean(overall_satisfaction), 
+            mean(accommodates), 
+            mean(bedrooms),
+            mean(minstay))
+
+
+ggplot(data=AirBnb.data, aes(x= entire,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) + ggtitle("Entire Home vs. Price")
+
+ggplot(data=AirBnb.data, aes(x= private,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) + ggtitle("Private Room vs. Price")
+
+ggplot(data=AirBnb.data, aes(x= shared,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) + ggtitle("Shared Room vs. Price")
+```
+```{r fig.height=10, fig.width=7}
+ggplot(data=AirBnb.data, aes(x= room_type,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) 
+```
+
+* Furthermore, in all neighborhoods, it seems to be the pattern that if there is a high percentage of blacks in the neighborhood, the price of the unit will be lower than if there were a lower percentage of blacks. 
+```{r}
+ggplot(data=AirBnb.data, aes(x=HighBlack,y=price)) + 
+  geom_boxplot() + coord_flip()
+```
+```{r fig.height=10, fig.width=7}
+ggplot(data=AirBnb.data, aes(x= HighBlack,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) + ggtitle("HighBlack vs. Price")
+```
 
 ```{r}
 modelA <- lmer(price ~ 1 + (1|neighborhood), data = AirBnb.data)
