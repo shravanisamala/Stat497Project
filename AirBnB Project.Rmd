@@ -344,17 +344,28 @@ BIC(modelC_4)
 
 \[Y_{ij} = \alpha_0 + \alpha_1(HighBlack) + \alpha_2(WalkScore) + \beta_0(HighRev) + \beta_1(HighBlack*HighRev) + \beta_2(WalkScore* HighRev) + \gamma_0(accommodates) + \gamma_1(HighBlack*accommodates) + \gamma_2(WalkScore*accommodates) u_i + v_i(HighRev) + w_i(accommodates) + \varepsilon_{ij}\]
 
-* $\hat{\alpha}_{0}$ = 3.1165; The mean price of an Air Bnb when there a low percentage of black population, WalkScore is 0, a low number of reviews and accommodates zero people is 3.1165.
-* $\hat{\alpha}_{1}$ = 21.3451; The mean price of an Air Bnb is 29.603.
-* $\hat{\alpha}_{2}$ = 0.3025; The mean price of an Air Bnb is 29.603.
-* $\hat{\beta}_{0}$ = 70.4237; The mean decrease in price for units with high reviews is -8.600.
-* $\hat{\beta}_{1}$ = -1.4321; The mean decrease in price for units with high reviews is -8.600. 
-* $\hat{\beta}_{2}$ = -0.9429; The mean decrease in price for units with high reviews is -8.600. 
-* $\hat{\gamma}_{0}$ = -21.3982; The mean decrease in price for units with high reviews is -8.600. 
-* $\hat{\gamma}_1$ = -9.2030; The mean increase in price for every one-unit increase in accommodation is 19.138. 
-* $\hat{\gamma}_2$ = 0.5224; The mean increase in price for every one-unit increase in accommodation is 19.138.
-* $\hat{\sigma}_{u}$= 17.11;  The variance in between-neighborhood deviations in price for units having a high number of reviews is 41.06.
-* $\hat{\sigma}_{v}$= 83.27;  The variance in between-person deviations in price for every increase in accommodations if is 114.54.
+* $\hat{\alpha}_{0}$ = 3.1165; The estimated mean price of an Air Bnb when there is a low percentage of black population, WalkScore is 0, a low number of reviews and accommodates zero people is 3.1165.
+
+* $\hat{\alpha}_{1}$ = 21.3451; The estimated mean price of an Air Bnb when there is a high black population, controlling for the other variables, is 21.3451 higher than neighborhoods with low black populations. 
+
+* $\hat{\alpha}_{2}$ = 0.3025; The estimated mean increase in price of an Air Bnb for every one-unit increase in WalkScore, controlling for the other varibalesis, is 0.3025.
+
+* $\hat{\beta}_{0}$ = 70.4237; The estimated mean difference in price for units with high reviews is 70.4237 more than units with a low number of reviews, controlling for the other variables. 
+
+* $\hat{\beta}_{1}$ = -1.4321; The estimated mean difference in price for Air BnB's with a high black population percentage is 1.4321 dollars lower than Air BnB's with low black population percentage, when the unit has high reviews and the other variables are controlled.
+
+* $\hat{\beta}_{2}$ = -0.9429; The estimated mean difference in price for Air Bnb's with a high number of reviews is 0.9429 less than those with low reviews, for every one-unit increase in Walk Score and controlling for other variables. 
+
+* $\hat{\gamma}_{0}$ = -21.3982; The estimated mean decrease in price for Air Bnb's for every one-unit increase in accomodates is 21.3982. 
+
+* $\hat{\gamma}_1$ = -9.2030; The estimated mean difference in price for Air Bnb's with a high black population percentage is 9.2030 less than Air Bnb's with a low black population percentage, for every one-unit incresae in accommodates and controlling for other variables. 
+
+* $\hat{\gamma}_2$ = 0.5224; When WalkScore increases by one-unit, the effect of a one-unit increase in accommodates is estimated to increase the mean price of an Air Bnb by 0.5224. 
+
+* $\hat{\sigma}_{u}$= 17.11;  The variance in between-neighborhood deviations in price for Air Bnb's with a high number of reviews is 17.11.
+
+* $\hat{\sigma}_{v}$= 83.27;  The variance in between-neighborhood deviations in price for an Air Bnb for every one-unit increase in accommodates is 83.27. 
+
 * $\rho_{uv}$ = -0.81; the correlation in an Air Bnb's price that has a high number of reviews and their differences in price for ever one-unit increase in accommodations.
 
 
