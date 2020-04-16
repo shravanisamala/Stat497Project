@@ -26,6 +26,10 @@ library(lmtest)
 ```
 # Introduction
 
+My family and I have had to stay in many hotels over our lives. Personally, whenever I have gone on school trips, college visits, and many other types of travels, I would stay in a hotel with my friends and family. Sometimes, my mom would gather the whole family around her computer and ask us which hotel looked better to us. My dad worries about the price of the hotel, my mom reads all the reviews, and my sister and I just wonder if they serve breakfast in the morning. That being said, everyone's decision on which hotel to stay in depends on many factors. However, I have never stayed at an Air Bnb. Apparently, we can rent out entire homes or just a specific room of someone else's property. So, I am assuming the decisions people make about which Air Bnb to stay in is pretty similar to those they make when looking at hotels. 
+
+First, I would like to know what variables most often lead to greater odds that a person is completely satisfied with their stay at an AirBnb (satisfaction = 1, overall_satisfaction = 5). Then, I would like to look at what factors contribute to the price of the Air Bnb. 
+
 Variables included in data: 
 *overall_satisfaction = rating on a 0-5 scale.
 *price = price for one night (in dollars)
@@ -50,6 +54,7 @@ Variables created:
 *HighBlack = 1 if PctBlack above .60, 0 otherwise
 *HighRev = 1 if unit has more than 100 reviews posted, 0 otherwise
 
+### Importing and Cleaning the Data
 ```{r}
 myFile2 <- "https://raw.githubusercontent.com/proback/BYSH/master/data/airbnb.csv"
 AirBnb.data <- read_csv(myFile2)
@@ -146,7 +151,7 @@ fullFinalModel <- step(fullModel, direction = "backward")
 summary(fullFinalModel)
 ```
 
-* Given that this is a somewhat complicate model with six parameter, two of which include an interaction between two variables, I wanted to test if the additive model would be sufficient in predicting the odds that the customer would be satisfied with their stay. 
+* Given that this is a somewhat of a complicated model with six parameter, two of which include an interaction between two variables, I wanted to test if the additive model would be sufficient in predicting the odds that the customer would be satisfied with their stay. 
 
 * Therefore: 
 
@@ -170,19 +175,18 @@ $\beta_0$ = -1.7094179 --> 0.1809711; the estimated odds of being completely sat
 $\beta_1$ = -1.0877718 --> 0.3369664; the estimated decrease in odds of the customer being completely satisfied with their stay for every one-unit increase in accommodates is 0.3369664, holding all other variables at a fixed value. 
 $\beta_2$ = 0.0592719 --> 1.0610637; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in price is 1.0610637, holding all other variables at a fixed value.
 $\beta_3$ = 0.0268196 --> 1.0285972; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in WalkScore is 1.0285972, holding all other variables at a fixed value.
-$\beta_4$ = 0.0099619 --> 1.0100116; For every one-unit increase in acommodations, the effect of an additional unit of WalkScore will increase the odds of a customer being completely satisfied by 1.0100116. 
-$\beta_5$ = -0.0006085 --> 0.9993916; For every one-unit increase in price, the effect of an additional unit of WalkSCore will increase the odds of a customer being completely satisfied by 1.0100116. 
+$\beta_4$ = 0.0099619 --> 1.0100116; For every one-unit increase in acommodations, the effect of an additional unit of WalkScore is estimated to increase the odds of a customer being completely satisfied by 1.0100116. 
+$\beta_5$ = -0.0006085 --> 0.9993916; For every one-unit increase in price, the effect of an additional unit of WalkSCore is estimated to increase the odds of a customer being completely satisfied by 1.0100116. 
+
+### Conclusion: 
+* After looking at summary statistics and barplots, the seven variables I was interested in testing were bedrooms, accommodates, price, minstay, WalkScore, TransitScore, and BikeScore. I fit each variable in its own logistic regression model to see if they were significant in predicting the odds of complete satisfaction for customers. The final model created after backwards elimination contained the variables, accommodates, price, WalkScore, as well as the interactions accommodates * walkScore and price * WalkScore. To test is the model could be reduced to the just the additive model, I performed an LRT test; the results showed that the interactions were significant and should be kept in the model. 
 
 # Research Question 2: When renting an Air BnB, to what extent to the racial composition of the neighborhood, quality of neighborhood for walking, number of people the unit is able to accomodate and number of reviews,  affect the price of the unit you choose?
 ### EDA
 * Level 1 (price) predictors: overall_satisfaction, satisfaction, reviews, room_type, accommodates, bedrooms, minstay
 * Level 2 (neighborhood) predictors: district, WalkScore, TransitScore, BikeScore, PctBlack, and HighBlack
-* Fixed effects: HighBlack, 
-* Random effects: the neighborhood of each Air Bnb
 
 * The summary statistics give show us how the means of WalkScore and accommodates,and the counts for HighBlack and HighRev all vary from neighborhood to neighborhood. When testing these variables in the model, we will be able to see how they affect the mean price in each neighborhood. 
-
-* As seen in the dot plots, the overall pattern for each neighborhood appears to be that shared rooms are the lowest in price, private rooms are more expensive than shared rooms, but less expensive that entire homes (which are the most expensive). 
 
 * Furthermore, in all neighborhoods, it seems to be the pattern that if there is a high percentage of blacks in the neighborhood, the price of the unit will be lower than if there were a lower percentage of blacks. 
 
@@ -368,6 +372,6 @@ BIC(modelC_4)
 
 * $\rho_{uv}$ = -0.81; the correlation in an Air Bnb's price that has a high number of reviews and their differences in price for ever one-unit increase in accommodations.
 
-
-
+### Conclusion: 
+* Given that my dad is always worried about the price of a hotel, I wanted to look into what factors contribute to the price of an Air Bnb. The four variables that chose to look at were HighBlack (greater than 60 % of the population in neighborhood is black), HighRev (Air Bnb has more than 100 reviews posted), accommodates (how many the Air Bnb can accommodate), and WalkScore (how "walkable" the neighborhood is). After fitting the full model, I wanted to see if the model could be reduced further. However, after comparing the full model to the additive model, the full model turned out to be better. However, when comparing the additive model to the even further-reduced model (resulting from backwards elimination), the further-reduced model turned out to be better. Therefore, after looking at the AIC and BIC of each model, I decided to keep the full model in hopes of not losing any variables that could potentially explain the estimated mean price. 
 
