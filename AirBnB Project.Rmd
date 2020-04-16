@@ -180,7 +180,7 @@ $\beta_5$ = -0.0006085 --> 0.9993916; For every one-unit increase in price, the 
 * Fixed effects: HighBlack, 
 * Random effects: the neighborhood of each Air Bnb
 
-* The summary statistics give show us that variables such as WalkScore, TransitScore, and BikeScore all vary from neighborhood to neighborhood. When testing these variables in the model, we will be able to see how they affect the price of the units. 
+* The summary statistics give show us how the means of WalkScore and accommodates,and the counts for HighBlack and HighRev all vary from neighborhood to neighborhood. When testing these variables in the model, we will be able to see how they affect the mean price in each neighborhood. 
 
 * As seen in the dot plots, the overall pattern for each neighborhood appears to be that shared rooms are the lowest in price, private rooms are more expensive than shared rooms, but less expensive that entire homes (which are the most expensive). 
 
@@ -192,28 +192,16 @@ $\beta_5$ = -0.0006085 --> 0.9993916; For every one-unit increase in price, the 
 AirBnb.data %>%
   group_by(neighborhood) %>%
   summarise(mean(price),
-            mean(WalkScore), 
-            mean(TransitScore),
-            mean(BikeScore), 
-            mean(PctBlack),
-            mean(overall_satisfaction), 
-            mean(accommodates), 
-            mean(bedrooms),
-            mean(minstay))
-
-
-ggplot(data=AirBnb.data, aes(x= entire,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) + ggtitle("Entire Home vs. Price")
-
-ggplot(data=AirBnb.data, aes(x= private,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) + ggtitle("Private Room vs. Price")
-
-ggplot(data=AirBnb.data, aes(x= shared,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) + ggtitle("Shared Room vs. Price")
+            mean(WalkScore),
+            mean(accommodates),
+            count(HighBlack),
+            count(HighRev))
+          
 ```
-```{r fig.height=10, fig.width=7}
-ggplot(data=AirBnb.data, aes(x= room_type,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) 
-```
+
 ```{r}
 ggplot(data=AirBnb.data, aes(x=HighBlack,y=price)) + 
-  geom_boxplot() + coord_flip()
+  geom_boxplot() + coord_flip() + ggtitle("HighBlack vs Price (all neighborhoods combined0")
 ```
 ```{r fig.height=10, fig.width=7}
 ggplot(data=AirBnb.data, aes(x= HighBlack,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) + ggtitle("HighBlack vs. Price")
@@ -221,12 +209,13 @@ ggplot(data=AirBnb.data, aes(x= HighBlack,y=price)) +  geom_dotplot(binaxis="y")
 
 ```{r}
 ggplot(data=AirBnb.data, aes(x=HighRev,y=price)) + 
-  geom_boxplot() + coord_flip()
+  geom_boxplot() + coord_flip() + ggtitle("HighRev vs. Price (all neighborhoods combined)")
 ```
 
 ```{r fig.height=10, fig.width=7}
 ggplot(data=AirBnb.data, aes(x= HighRev,y=price)) +  geom_dotplot(binaxis="y") +    coord_flip() + facet_wrap(~neighborhood,ncol=5) + ggtitle("HighBlack vs. Price")
 ```
+
 ### Fitting the Models for Research Question 2
 ##### Unconditional Means Model to asses amount of variation at each level
 * $\alpha_0$ = 97.289
@@ -265,7 +254,7 @@ summary(modelB)
 
 * $\hat{\alpha}_{0}$ = 29.603; The mean price of an Air Bnb is 29.603.
 * $\hat{\beta}_{0}$ = -8.600; The mean decrease in price for units with high reviews is -8.600. 
-* $\gamma_1$ = 19.118; The mean increase in price for every one-unit increase in accommodation is 19.138. 
+* $\hat\gamma_{0}$ = 19.118; The mean increase in price for every one-unit increase in accommodation is 19.138. 
 * $\hat{\sigma}_{2u}$= 41.06;  The variance in between-neighborhood deviations in price for units having a high number of reviews is 41.06.
 * $\hat{\sigma}_{2v}$= 114.54;  The variance in between-person deviations in price for every increase in accommodations if is 114.54.
 * $\hat{\sigma}_2$ = 3641.82, the estimated variance in within neighborhood deviations. 
@@ -285,22 +274,88 @@ $c_i=\gamma_0 + \gamma_1(HighBlack) +\gamma_2(WalkScore) + w_i$
 
 * Composite Model: 
 
-\[Y_{ij} = \alpha_0 + \alpha_1(cenMPQ) + beta_0(audInstr) + \beta_1(cenMPQ*audInstr) + \gamma_0(audStud) + \gamma_1(cenMPQ*audStud) u_i + v_i(audInstr) + w_i(audStud) + \varepsilon_{ij}\]
+\[Y_{ij} = \alpha_0 + \alpha_1(HighBlack) + \alpha_2(WalkScore) + \beta_0(HighRev) + \beta_1(HighBlack*HighRev) + \beta_2(WalkScore* HighRev) + \gamma_0(accommodates) + \gamma_1(HighBlack*accommodates) + \gamma_2(WalkScore*accommodates) u_i + v_i(HighRev) + w_i(accommodates) + \varepsilon_{ij}\]
 
 where $\varepsilon_{ij}\sim N(0,\sigma^2)$, $u_i \sim N(0,\sigma^2_u)$, $v_i \sim N(0,\sigma^2_u)$, $w_i \sim N(0,\sigma^2_u)$. 
 
 ```{r}
 modelC <- lmer(price ~ HighBlack*HighRev + HighBlack*accommodates + WalkScore*HighRev + WalkScore*accommodates + (HighRev + accommodates|neighborhood), data = AirBnb.data)
 summary(modelC)
+``` 
+
+
+* As seen above, none of the variables are significant in predicting price. Therefore, through backwards elimination, I would like to see if we can simplify the model further. After doing this, the final model is: 
+
+\[Y_{ij} = \alpha_0 + \alpha_1(WalkScore) + \beta_0(accommodates) + \beta_1(Walkscore*accommodates)\]
+
+
+```{r message=FALSE, warning=FALSE}
+# Remove HighBlack*HighRev interaction
+modelC_1 <- lmer(price ~ HighBlack + HighRev + accommodates + WalkScore + HighBlack*accommodates + WalkScore*HighRev + WalkScore*accommodates + (HighRev + accommodates|neighborhood), data = AirBnb.data)
+# summary(modelC_1)
+
+# Remove HighRev*WalkScore
+modelC_2 <- lmer(price ~ HighBlack + HighRev + accommodates + WalkScore + HighBlack*accommodates + WalkScore*accommodates + (HighRev + accommodates|neighborhood), data = AirBnb.data)
+#summary(modelC_2)
+
+# Remove HighBlack*accommodates
+modelC_3 <- lmer(price ~ HighBlack + HighRev + accommodates + WalkScore + WalkScore*accommodates + (HighRev + accommodates|neighborhood), data = AirBnb.data)
+#summary(modelC_3)
+
+# Remove HighBlack
+modelC_4 <- lmer(price ~ HighRev + accommodates + WalkScore + WalkScore*accommodates + (HighRev + accommodates|neighborhood), data = AirBnb.data)
+#summary(modelC_4)
+
+# Remove HighRev
+modelC_4 <- lmer(price ~ accommodates + WalkScore + WalkScore*accommodates + (HighRev + accommodates|neighborhood), data = AirBnb.data)
+summary(modelC_4)
+
 ```
 
-
-
-
-
+* However, would the additive model, with all four variables, better explain price variation within neighborhoods? First, I will compare the full model, model C, to the additive model, model D. Then I will compare the additive model to the model given from backwards elimination. 
+* Comparing model C and D: 
+The LRT statistic is 11.57 and the p-value is 0.02085. Because the p-value of 0.02085 is less than $\alpha$ = 0.05, we reject the null hypothesis and have sufficient evidence to say that modelC, the full model, is a better model. 
+* Comparing model D and model C_4
+The LRT statistic is 0 and the p-value is 1. Because the p-value of 1 is greater than $\alpha$ = 0.05, we fail to reject the null hypothesis that the further reduced model, modelC_4, is a sufficient model. *These test opose themselves, the first test tells us that the full model is better than the additive model, but the second test tells us that the further reduced model is better than the additive model. Therefore, it would be good to check the AIC and BIC for each model in order to make a decision on the final model.
 ```{r}
+modelD <- lmer(price ~ HighBlack + WalkScore + HighRev + accommodates + (HighRev + accommodates|neighborhood), data = AirBnb.data)
+summary(modelD)
 
+anova(modelC, modelD)
+
+anova(modelD, modelC_4)
 ```
+*The AIC shows that modelC is the better model, but the BIC shows that modelC_4 is better. Therefore, I choose to stand by modelC because I would rather take the chance of some predictors not explaining price versus missing predictors that could be potentially significant. 
+```{r}
+#Full model
+AIC(modelC)
+BIC(modelC)
+
+#Additive model
+AIC(modelD)
+BIC(modelD)
+
+#Further reduced model
+AIC(modelC_4)
+BIC(modelC_4)
+```
+
+* Therefore the final model and its interpretations are:  
+
+\[Y_{ij} = \alpha_0 + \alpha_1(HighBlack) + \alpha_2(WalkScore) + \beta_0(HighRev) + \beta_1(HighBlack*HighRev) + \beta_2(WalkScore* HighRev) + \gamma_0(accommodates) + \gamma_1(HighBlack*accommodates) + \gamma_2(WalkScore*accommodates) u_i + v_i(HighRev) + w_i(accommodates) + \varepsilon_{ij}\]
+
+* $\hat{\alpha}_{0}$ = 3.1165; The mean price of an Air Bnb when there a low percentage of black population, WalkScore is 0, a low number of reviews and accommodates zero people is 3.1165.
+* $\hat{\alpha}_{1}$ = 21.3451; The mean price of an Air Bnb is 29.603.
+* $\hat{\alpha}_{2}$ = 0.3025; The mean price of an Air Bnb is 29.603.
+* $\hat{\beta}_{0}$ = 70.4237; The mean decrease in price for units with high reviews is -8.600.
+* $\hat{\beta}_{1}$ = -1.4321; The mean decrease in price for units with high reviews is -8.600. 
+* $\hat{\beta}_{2}$ = -0.9429; The mean decrease in price for units with high reviews is -8.600. 
+* $\hat{\gamma}_{0}$ = -21.3982; The mean decrease in price for units with high reviews is -8.600. 
+* $\hat{\gamma}_1$ = -9.2030; The mean increase in price for every one-unit increase in accommodation is 19.138. 
+* $\hat{\gamma}_2$ = 0.5224; The mean increase in price for every one-unit increase in accommodation is 19.138.
+* $\hat{\sigma}_{u}$= 17.11;  The variance in between-neighborhood deviations in price for units having a high number of reviews is 41.06.
+* $\hat{\sigma}_{v}$= 83.27;  The variance in between-person deviations in price for every increase in accommodations if is 114.54.
+* $\rho_{uv}$ = -0.81; the correlation in an Air Bnb's price that has a high number of reviews and their differences in price for ever one-unit increase in accommodations.
 
 
 
