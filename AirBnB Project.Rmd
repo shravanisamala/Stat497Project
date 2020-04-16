@@ -31,27 +31,47 @@ My family and I have had to stay in many hotels over our lives. Personally, when
 First, I would like to know what variables most often lead to greater odds that a person is completely satisfied with their stay at an AirBnb (satisfaction = 1, overall_satisfaction = 5). Then, I would like to look at what factors contribute to the price of the Air Bnb. 
 
 Variables included in data: 
+
 *overall_satisfaction = rating on a 0-5 scale.
+ 
 *price = price for one night (in dollars)
+
 *reviews = number of reviews posted
+
 *room_type = Entire home/apt, Private room, or Shared room
+
 *accommodates = number of people the unit can hold
+
 *bedrooms = number of bedrooms
+
 *minstay = minimum length of stay (in days)
+
 *neighborhood = neighborhood where unit is located (1 of 43)
+
 *district = district where unit is located (1 of 9)
+
 *WalkScore = quality of the neighborhood for walking (0-100)
+
 *TransitScore = quality of the neighborhood for public transit (0-100)
+
 *BikeScore = quality of the neighborhood for biking (0-100)
+
 *PctBlack = proportion of black residents in a neighborhood
 
 Variables created: 
+
 *satisfaction = 1 if overall_satisfaction is 5, 0 otherwise
+
 *priceHigh = 1 if price is greater than or equal to 120, 0 otherwise
+
 *entire = 1 if room_type is Entire home/apt, 0 otherwise
+
 *private = 1 if room_type is Private room, 0 otherwise
+
 *shared = 1 if room_type is Shared room, 0 otherwise
+
 *HighBlack = 1 if PctBlack above .60, 0 otherwise
+
 *HighRev = 1 if unit has more than 100 reviews posted, 0 otherwise
 
 ### Importing and Cleaning the Data
@@ -184,6 +204,7 @@ $\beta_5$ = -0.0006085 --> 0.9993916; For every one-unit increase in price, the 
 # Research Question 2: When renting an Air BnB, to what extent to the racial composition of the neighborhood, quality of neighborhood for walking, number of people the unit is able to accomodate and number of reviews,  affect the price of the unit you choose?
 ### EDA
 * Level 1 (price) predictors: overall_satisfaction, satisfaction, reviews, room_type, accommodates, bedrooms, minstay
+
 * Level 2 (neighborhood) predictors: district, WalkScore, TransitScore, BikeScore, PctBlack, and HighBlack
 
 * The summary statistics give show us how the means of WalkScore and accommodates,and the counts for HighBlack and HighRev all vary from neighborhood to neighborhood. When testing these variables in the model, we will be able to see how they affect the mean price in each neighborhood. 
@@ -241,9 +262,11 @@ summary(modelA)
 
 * Level 2: 
 
-$a_i=\alpha_0 + u_i$
-$b_i=\beta_0 + v_i$
-$c_i=\gamma_0 + w_i$
+\begin{align*}
+a_i=\alpha_0 + u_i\\
+b_i=\beta_0 + v_i\\
+c_i=\gamma_0 + w_i
+\end{align*}
 
 * Composite Model: 
 
@@ -271,10 +294,11 @@ summary(modelB)
 
 * Level 2: 
 
-$a_i=\alpha_0 + \alpha_1(HighBlack) + \alpha_2(WalkScore) + u_i$
-$b_i=\beta_0 + \beta_1(HighBlack) + \beta_2(WalkScore) + v_i$
-$c_i=\gamma_0 + \gamma_1(HighBlack) +\gamma_2(WalkScore) + w_i$
-
+\begin{align*}
+a_i=\alpha_0 + \alpha_1(HighBlack) + \alpha_2(WalkScore) + u_i\\
+b_i=\beta_0 + \beta_1(HighBlack) + \beta_2(WalkScore) + v_i\\
+c_i=\gamma_0 + \gamma_1(HighBlack) +\gamma_2(WalkScore) + w_i
+\end{align*}
 
 * Composite Model: 
 

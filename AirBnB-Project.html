@@ -387,8 +387,32 @@ library(VGAM)
 library(lmtest)</code></pre>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Variables included in data: <em>overall_satisfaction = rating on a 0-5 scale. </em>price = price for one night (in dollars) <em>reviews = number of reviews posted </em>room_type = Entire home/apt, Private room, or Shared room <em>accommodates = number of people the unit can hold </em>bedrooms = number of bedrooms <em>minstay = minimum length of stay (in days) </em>neighborhood = neighborhood where unit is located (1 of 43) <em>district = district where unit is located (1 of 9) </em>WalkScore = quality of the neighborhood for walking (0-100) <em>TransitScore = quality of the neighborhood for public transit (0-100) </em>BikeScore = quality of the neighborhood for biking (0-100) *PctBlack = proportion of black residents in a neighborhood</p>
-<p>Variables created: <em>satisfaction = 1 if overall_satisfaction is 5, 0 otherwise </em>priceHigh = 1 if price is greater than or equal to 120, 0 otherwise <em>entire = 1 if room_type is Entire home/apt, 0 otherwise </em>private = 1 if room_type is Private room, 0 otherwise <em>shared = 1 if room_type is Shared room, 0 otherwise </em>HighBlack = 1 if PctBlack above .60, 0 otherwise *HighRev = 1 if unit has more than 100 reviews posted, 0 otherwise</p>
+<p>My family and I have had to stay in many hotels over our lives. Personally, whenever I have gone on school trips, college visits, and many other types of travels, I would stay in a hotel with my friends and family. Sometimes, my mom would gather the whole family around her computer and ask us which hotel looked better to us. My dad worries about the price of the hotel, my mom reads all the reviews, and my sister and I just wonder if they serve breakfast in the morning. That being said, everyone’s decision on which hotel to stay in depends on many factors. However, I have never stayed at an Air Bnb. Apparently, we can rent out entire homes or just a specific room of someone else’s property. So, I am assuming the decisions people make about which Air Bnb to stay in is pretty similar to those they make when looking at hotels.</p>
+<p>First, I would like to know what variables most often lead to greater odds that a person is completely satisfied with their stay at an AirBnb (satisfaction = 1, overall_satisfaction = 5). Then, I would like to look at what factors contribute to the price of the Air Bnb.</p>
+<p>Variables included in data:</p>
+<p>*overall_satisfaction = rating on a 0-5 scale.</p>
+<p>*price = price for one night (in dollars)</p>
+<p>*reviews = number of reviews posted</p>
+<p>*room_type = Entire home/apt, Private room, or Shared room</p>
+<p>*accommodates = number of people the unit can hold</p>
+<p>*bedrooms = number of bedrooms</p>
+<p>*minstay = minimum length of stay (in days)</p>
+<p>*neighborhood = neighborhood where unit is located (1 of 43)</p>
+<p>*district = district where unit is located (1 of 9)</p>
+<p>*WalkScore = quality of the neighborhood for walking (0-100)</p>
+<p>*TransitScore = quality of the neighborhood for public transit (0-100)</p>
+<p>*BikeScore = quality of the neighborhood for biking (0-100)</p>
+<p>*PctBlack = proportion of black residents in a neighborhood</p>
+<p>Variables created:</p>
+<p>*satisfaction = 1 if overall_satisfaction is 5, 0 otherwise</p>
+<p>*priceHigh = 1 if price is greater than or equal to 120, 0 otherwise</p>
+<p>*entire = 1 if room_type is Entire home/apt, 0 otherwise</p>
+<p>*private = 1 if room_type is Private room, 0 otherwise</p>
+<p>*shared = 1 if room_type is Shared room, 0 otherwise</p>
+<p>*HighBlack = 1 if PctBlack above .60, 0 otherwise</p>
+<p>*HighRev = 1 if unit has more than 100 reviews posted, 0 otherwise</p>
+<div id="importing-and-cleaning-the-data" class="section level3">
+<h3>Importing and Cleaning the Data</h3>
 <pre class="r"><code>myFile2 &lt;- &quot;https://raw.githubusercontent.com/proback/BYSH/master/data/airbnb.csv&quot;
 AirBnb.data &lt;- read_csv(myFile2)</code></pre>
 <pre><code>## Warning: Missing column names filled in: &#39;X1&#39; [1]</code></pre>
@@ -472,6 +496,7 @@ head(AirBnb.data)</code></pre>
 ## $ shared               &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
 ## $ HighBlack            &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
 ## $ HighRev              &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...</code></pre>
+</div>
 </div>
 <div id="research-question-1-what-variables-contribute-to-a-customers-complete-satisfaction-with-a-hotel" class="section level1">
 <h1>Research Question 1: What variables contribute to a customer’s complete satisfaction with a hotel?</h1>
@@ -744,7 +769,7 @@ fullFinalModel &lt;- step(fullModel, direction = &quot;backward&quot;)</code></p
 ## 
 ## Number of Fisher Scoring iterations: 4</code></pre>
 <ul>
-<li><p>Given that this is a somewhat complicate model with six parameter, two of which include an interaction between two variables, I wanted to test if the additive model would be sufficient in predicting the odds that the customer would be satisfied with their stay.</p></li>
+<li><p>Given that this is a somewhat of a complicated model with six parameter, two of which include an interaction between two variables, I wanted to test if the additive model would be sufficient in predicting the odds that the customer would be satisfied with their stay.</p></li>
 <li><p>Therefore:</p></li>
 </ul>
 <p><span class="math display">\[H_0: log(pi/(1−pi)) = \beta_0 + \beta_1(accommodates) + \beta_2(price) + \beta_3(WalkScore)\]</span> <span class="math display">\[H_a: log(pi/(1−pi)) = \beta_0 + \beta_1(accommodates) + \beta_2(price) + \beta_3(WalkScore) + \beta_4(accommodates*WalkScore) + \beta_5(price*WalkScore)\]</span></p>
@@ -770,7 +795,13 @@ lrtest(fullFinalModel, redFinalModel)</code></pre>
 <p><span class="math display">\[log(pi/(1−pi)) = \beta_0 + \beta_1(accommodates) + \beta_2(price) + \beta_3(WalkScore) + \beta_4(accommodates*WalkScore) + \beta_5(price*WalkScore)\]</span></p>
 <ul>
 <li>Interpretations: (log odds –&gt; odds(<span class="math inline">\(e\)</span> raised to each parameter)) <span class="math inline">\(\beta_0\)</span> = -1.7094179 –&gt; 0.1809711; the estimated odds of being completely satisfied (satisfaction = 1) is 0.1809711.<br />
-<span class="math inline">\(\beta_1\)</span> = -1.0877718 –&gt; 0.3369664; the estimated decrease in odds of the customer being completely satisfied with their stay for every one-unit increase in accommodates is 0.3369664, holding all other variables at a fixed value. <span class="math inline">\(\beta_2\)</span> = 0.0592719 –&gt; 1.0610637; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in price is 1.0610637, holding all other variables at a fixed value. <span class="math inline">\(\beta_3\)</span> = 0.0268196 –&gt; 1.0285972; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in WalkScore is 1.0285972, holding all other variables at a fixed value. <span class="math inline">\(\beta_4\)</span> = 0.0099619 –&gt; 1.0100116; For every one-unit increase in acommodations, the effect of an additional unit of WalkScore will increase the odds of a customer being completely satisfied by 1.0100116. <span class="math inline">\(\beta_5\)</span> = -0.0006085 –&gt; 0.9993916; For every one-unit increase in price, the effect of an additional unit of WalkSCore will increase the odds of a customer being completely satisfied by 1.0100116.</li>
+<span class="math inline">\(\beta_1\)</span> = -1.0877718 –&gt; 0.3369664; the estimated decrease in odds of the customer being completely satisfied with their stay for every one-unit increase in accommodates is 0.3369664, holding all other variables at a fixed value. <span class="math inline">\(\beta_2\)</span> = 0.0592719 –&gt; 1.0610637; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in price is 1.0610637, holding all other variables at a fixed value. <span class="math inline">\(\beta_3\)</span> = 0.0268196 –&gt; 1.0285972; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in WalkScore is 1.0285972, holding all other variables at a fixed value. <span class="math inline">\(\beta_4\)</span> = 0.0099619 –&gt; 1.0100116; For every one-unit increase in acommodations, the effect of an additional unit of WalkScore is estimated to increase the odds of a customer being completely satisfied by 1.0100116. <span class="math inline">\(\beta_5\)</span> = -0.0006085 –&gt; 0.9993916; For every one-unit increase in price, the effect of an additional unit of WalkSCore is estimated to increase the odds of a customer being completely satisfied by 1.0100116.</li>
+</ul>
+</div>
+<div id="conclusion" class="section level3">
+<h3>Conclusion:</h3>
+<ul>
+<li>After looking at summary statistics and barplots, the seven variables I was interested in testing were bedrooms, accommodates, price, minstay, WalkScore, TransitScore, and BikeScore. I fit each variable in its own logistic regression model to see if they were significant in predicting the odds of complete satisfaction for customers. The final model created after backwards elimination contained the variables, accommodates, price, WalkScore, as well as the interactions accommodates * walkScore and price * WalkScore. To test is the model could be reduced to the just the additive model, I performed an LRT test; the results showed that the interactions were significant and should be kept in the model.</li>
 </ul>
 </div>
 </div>
@@ -779,12 +810,9 @@ lrtest(fullFinalModel, redFinalModel)</code></pre>
 <div id="eda-1" class="section level3">
 <h3>EDA</h3>
 <ul>
-<li>Level 1 (price) predictors: overall_satisfaction, satisfaction, reviews, room_type, accommodates, bedrooms, minstay</li>
-<li>Level 2 (neighborhood) predictors: district, WalkScore, TransitScore, BikeScore, PctBlack, and HighBlack</li>
-<li>Fixed effects: HighBlack,</li>
-<li><p>Random effects: the neighborhood of each Air Bnb</p></li>
+<li><p>Level 1 (price) predictors: overall_satisfaction, satisfaction, reviews, room_type, accommodates, bedrooms, minstay</p></li>
+<li><p>Level 2 (neighborhood) predictors: district, WalkScore, TransitScore, BikeScore, PctBlack, and HighBlack</p></li>
 <li><p>The summary statistics give show us how the means of WalkScore and accommodates,and the counts for HighBlack and HighRev all vary from neighborhood to neighborhood. When testing these variables in the model, we will be able to see how they affect the mean price in each neighborhood.</p></li>
-<li><p>As seen in the dot plots, the overall pattern for each neighborhood appears to be that shared rooms are the lowest in price, private rooms are more expensive than shared rooms, but less expensive that entire homes (which are the most expensive).</p></li>
 <li><p>Furthermore, in all neighborhoods, it seems to be the pattern that if there is a high percentage of blacks in the neighborhood, the price of the unit will be lower than if there were a lower percentage of blacks.</p></li>
 <li><p>There could be a possible neighborhood by HighRev interaction. Some neighborhoods such as West Lawn and Pullman have higher prices for units with a high number of reviews. Other neighborhoods, however, such as Logan Square and Jefferson Park have higher prices for units with less reviews.</p></li>
 </ul>
@@ -867,7 +895,11 @@ summary(modelA)</code></pre>
 <ul>
 <li>Level 2:</li>
 </ul>
-<p><span class="math inline">\(a_i=\alpha_0 + u_i\)</span> <span class="math inline">\(b_i=\beta_0 + v_i\)</span> <span class="math inline">\(c_i=\gamma_0 + w_i\)</span></p>
+<p><span class="math display">\[\begin{align*}
+a_i=\alpha_0 + u_i\\
+b_i=\beta_0 + v_i\\
+c_i=\gamma_0 + w_i
+\end{align*}\]</span></p>
 <ul>
 <li>Composite Model:</li>
 </ul>
@@ -929,7 +961,11 @@ summary(modelA)</code></pre>
 <ul>
 <li>Level 2:</li>
 </ul>
-<p><span class="math inline">\(a_i=\alpha_0 + \alpha_1(HighBlack) + \alpha_2(WalkScore) + u_i\)</span> <span class="math inline">\(b_i=\beta_0 + \beta_1(HighBlack) + \beta_2(WalkScore) + v_i\)</span> <span class="math inline">\(c_i=\gamma_0 + \gamma_1(HighBlack) +\gamma_2(WalkScore) + w_i\)</span></p>
+<p><span class="math display">\[\begin{align*}
+a_i=\alpha_0 + \alpha_1(HighBlack) + \alpha_2(WalkScore) + u_i\\
+b_i=\beta_0 + \beta_1(HighBlack) + \beta_2(WalkScore) + v_i\\
+c_i=\gamma_0 + \gamma_1(HighBlack) +\gamma_2(WalkScore) + w_i
+\end{align*}\]</span></p>
 <ul>
 <li>Composite Model:</li>
 </ul>
@@ -1145,20 +1181,26 @@ AIC(modelC_4)</code></pre>
 </ul>
 <p><span class="math display">\[Y_{ij} = \alpha_0 + \alpha_1(HighBlack) + \alpha_2(WalkScore) + \beta_0(HighRev) + \beta_1(HighBlack*HighRev) + \beta_2(WalkScore* HighRev) + \gamma_0(accommodates) + \gamma_1(HighBlack*accommodates) + \gamma_2(WalkScore*accommodates) u_i + v_i(HighRev) + w_i(accommodates) + \varepsilon_{ij}\]</span></p>
 <ul>
-<li><span class="math inline">\(\hat{\alpha}_{0}\)</span> = 3.1165; The mean price of an Air Bnb when there a low percentage of black population, WalkScore is 0, a low number of reviews and accommodates zero people is 3.1165.</li>
-<li><span class="math inline">\(\hat{\alpha}_{1}\)</span> = 21.3451; The mean price of an Air Bnb is 29.603.</li>
-<li><span class="math inline">\(\hat{\alpha}_{2}\)</span> = 0.3025; The mean price of an Air Bnb is 29.603.</li>
-<li><span class="math inline">\(\hat{\beta}_{0}\)</span> = 70.4237; The mean decrease in price for units with high reviews is -8.600.</li>
-<li><span class="math inline">\(\hat{\beta}_{1}\)</span> = -1.4321; The mean decrease in price for units with high reviews is -8.600.</li>
-<li><span class="math inline">\(\hat{\beta}_{2}\)</span> = -0.9429; The mean decrease in price for units with high reviews is -8.600.</li>
-<li><span class="math inline">\(\hat{\gamma}_{0}\)</span> = -21.3982; The mean decrease in price for units with high reviews is -8.600.</li>
-<li><span class="math inline">\(\hat{\gamma}_1\)</span> = -9.2030; The mean increase in price for every one-unit increase in accommodation is 19.138.</li>
-<li><span class="math inline">\(\hat{\gamma}_2\)</span> = 0.5224; The mean increase in price for every one-unit increase in accommodation is 19.138.</li>
-<li><span class="math inline">\(\hat{\sigma}_{u}\)</span>= 17.11; The variance in between-neighborhood deviations in price for units having a high number of reviews is 41.06.</li>
-<li><span class="math inline">\(\hat{\sigma}_{v}\)</span>= 83.27; The variance in between-person deviations in price for every increase in accommodations if is 114.54.</li>
-<li><span class="math inline">\(\rho_{uv}\)</span> = -0.81; the correlation in an Air Bnb’s price that has a high number of reviews and their differences in price for ever one-unit increase in accommodations.</li>
+<li><p><span class="math inline">\(\hat{\alpha}_{0}\)</span> = 3.1165; The estimated mean price of an Air Bnb when there is a low percentage of black population, WalkScore is 0, a low number of reviews and accommodates zero people is 3.1165.</p></li>
+<li><p><span class="math inline">\(\hat{\alpha}_{1}\)</span> = 21.3451; The estimated mean price of an Air Bnb when there is a high black population, controlling for the other variables, is 21.3451 higher than neighborhoods with low black populations.</p></li>
+<li><p><span class="math inline">\(\hat{\alpha}_{2}\)</span> = 0.3025; The estimated mean increase in price of an Air Bnb for every one-unit increase in WalkScore, controlling for the other varibalesis, is 0.3025.</p></li>
+<li><p><span class="math inline">\(\hat{\beta}_{0}\)</span> = 70.4237; The estimated mean difference in price for units with high reviews is 70.4237 more than units with a low number of reviews, controlling for the other variables.</p></li>
+<li><p><span class="math inline">\(\hat{\beta}_{1}\)</span> = -1.4321; The estimated mean difference in price for Air BnB’s with a high black population percentage is 1.4321 dollars lower than Air BnB’s with low black population percentage, when the unit has high reviews and the other variables are controlled.</p></li>
+<li><p><span class="math inline">\(\hat{\beta}_{2}\)</span> = -0.9429; The estimated mean difference in price for Air Bnb’s with a high number of reviews is 0.9429 less than those with low reviews, for every one-unit increase in Walk Score and controlling for other variables.</p></li>
+<li><p><span class="math inline">\(\hat{\gamma}_{0}\)</span> = -21.3982; The estimated mean decrease in price for Air Bnb’s for every one-unit increase in accomodates is 21.3982.</p></li>
+<li><p><span class="math inline">\(\hat{\gamma}_1\)</span> = -9.2030; The estimated mean difference in price for Air Bnb’s with a high black population percentage is 9.2030 less than Air Bnb’s with a low black population percentage, for every one-unit incresae in accommodates and controlling for other variables.</p></li>
+<li><p><span class="math inline">\(\hat{\gamma}_2\)</span> = 0.5224; When WalkScore increases by one-unit, the effect of a one-unit increase in accommodates is estimated to increase the mean price of an Air Bnb by 0.5224.</p></li>
+<li><p><span class="math inline">\(\hat{\sigma}_{u}\)</span>= 17.11; The variance in between-neighborhood deviations in price for Air Bnb’s with a high number of reviews is 17.11.</p></li>
+<li><p><span class="math inline">\(\hat{\sigma}_{v}\)</span>= 83.27; The variance in between-neighborhood deviations in price for an Air Bnb for every one-unit increase in accommodates is 83.27.</p></li>
+<li><p><span class="math inline">\(\rho_{uv}\)</span> = -0.81; the correlation in an Air Bnb’s price that has a high number of reviews and their differences in price for ever one-unit increase in accommodations.</p></li>
 </ul>
 </div>
+</div>
+<div id="conclusion-1" class="section level3">
+<h3>Conclusion:</h3>
+<ul>
+<li>Given that my dad is always worried about the price of a hotel, I wanted to look into what factors contribute to the price of an Air Bnb. The four variables that chose to look at were HighBlack (greater than 60 % of the population in neighborhood is black), HighRev (Air Bnb has more than 100 reviews posted), accommodates (how many the Air Bnb can accommodate), and WalkScore (how “walkable” the neighborhood is). After fitting the full model, I wanted to see if the model could be reduced further. However, after comparing the full model to the additive model, the full model turned out to be better. However, when comparing the additive model to the even further-reduced model (resulting from backwards elimination), the further-reduced model turned out to be better. Therefore, after looking at the AIC and BIC of each model, I decided to keep the full model in hopes of not losing any variables that could potentially explain the estimated mean price.</li>
+</ul>
 </div>
 </div>
 
