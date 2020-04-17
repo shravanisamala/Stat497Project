@@ -192,15 +192,16 @@ lrtest(fullFinalModel, redFinalModel)
 \[log(pi/(1−pi)) = \beta_0 + \beta_1(accommodates) + \beta_2(price) + \beta_3(WalkScore) + \beta_4(accommodates*WalkScore) + \beta_5(price*WalkScore)\]
 
 * Interpretations: (log odds --> odds($e$ raised to each parameter))
-$\beta_0$ = -1.7094179 --> 0.1809711; the estimated odds of being completely satisfied (satisfaction = 1) is 0.1809711.  
-$\beta_1$ = -1.0877718 --> 0.3369664; the estimated decrease in odds of the customer being completely satisfied with their stay for every one-unit increase in accommodates is 0.3369664, holding all other variables at a fixed value. 
-$\beta_2$ = 0.0592719 --> 1.0610637; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in price is 1.0610637, holding all other variables at a fixed value.
-$\beta_3$ = 0.0268196 --> 1.0285972; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in WalkScore is 1.0285972, holding all other variables at a fixed value.
-$\beta_4$ = 0.0099619 --> 1.0100116; For every one-unit increase in acommodations, the effect of an additional unit of WalkScore is estimated to increase the odds of a customer being completely satisfied by 1.0100116. 
-$\beta_5$ = -0.0006085 --> 0.9993916; For every one-unit increase in price, the effect of an additional unit of WalkSCore is estimated to increase the odds of a customer being completely satisfied by 1.0100116. 
+
+* $\beta_0$ = -1.7094179 --> 0.1809711; the estimated odds of being completely satisfied (satisfaction = 1) is 0.1809711.  
+* $\beta_1$ = -1.0877718 --> 0.3369664; the estimated decrease in odds of the customer being completely satisfied with their stay for every one-unit increase in accommodates is 0.3369664, holding all other variables at a fixed value. 
+* $\beta_2$ = 0.0592719 --> 1.0610637; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in price is 1.0610637, holding all other variables at a fixed value.
+* $\beta_3$ = 0.0268196 --> 1.0285972; the estimated increase in odds of the customer being completely satisfied with their stay for every one-unit increase in WalkScore is 1.0285972, holding all other variables at a fixed value.
+* $\beta_4$ = 0.0099619 --> 1.0100116; For every one-unit increase in acommodations, the effect of an additional unit of WalkScore is estimated to increase the odds of a customer being completely satisfied by 1.0100116. 
+* $\beta_5$ = -0.0006085 --> 0.9993916; For every one-unit increase in price, the effect of an additional unit of WalkSCore is estimated to increase the odds of a customer being completely satisfied by 1.0100116. 
 
 ### Conclusion: 
-* After looking at summary statistics and barplots, the seven variables I was interested in testing were bedrooms, accommodates, price, minstay, WalkScore, TransitScore, and BikeScore. I fit each variable in its own logistic regression model to see if they were significant in predicting the odds of complete satisfaction for customers. The final model created after backwards elimination contained the variables, accommodates, price, WalkScore, as well as the interactions accommodates * walkScore and price * WalkScore. To test is the model could be reduced to the just the additive model, I performed an LRT test; the results showed that the interactions were significant and should be kept in the model. 
+* After looking at summary statistics and barplots, the seven variables I was interested in testing were bedrooms, accommodates, price, minstay, WalkScore, TransitScore, and BikeScore. I fit each variable in its own logistic regression model to see if they were significant in predicting the odds of complete satisfaction for customers. The final model created after backwards elimination contained the variables, accommodates, price, WalkScore, as well as the interactions accommodates * walkScore and price * WalkScore. To test if the model could be reduced to the just the additive model, I performed an LRT test; the results showed that the interactions were significant and should be kept in the model. 
 
 # Research Question 2: When renting an Air BnB, to what extent to the racial composition of the neighborhood, quality of neighborhood for walking, number of people the unit is able to accomodate and number of reviews,  affect the price of the unit you choose?
 ### EDA
@@ -208,7 +209,7 @@ $\beta_5$ = -0.0006085 --> 0.9993916; For every one-unit increase in price, the 
 
 * Level 2 (neighborhood) predictors: district, WalkScore, TransitScore, BikeScore, PctBlack, and HighBlack
 
-* The summary statistics give show us how the means of WalkScore and accommodates,and the counts for HighBlack and HighRev all vary from neighborhood to neighborhood. When testing these variables in the model, we will be able to see how they affect the mean price in each neighborhood. 
+* The summary statistics given show us how the means of WalkScore and accommodates,and the counts for HighBlack and HighRev all vary from neighborhood to neighborhood. When testing these variables in the model, we will be able to see how they affect the mean price in each neighborhood. 
 
 * Furthermore, in all neighborhoods, it seems to be the pattern that if there is a high percentage of blacks in the neighborhood, the price of the unit will be lower than if there were a lower percentage of blacks. 
 
@@ -398,5 +399,5 @@ BIC(modelC_4)
 * $\rho_{uv}$ = -0.81; the correlation in an Air Bnb's price that has a high number of reviews and their differences in price for ever one-unit increase in accommodations.
 
 ### Conclusion: 
-* Given that my dad is always worried about the price of a hotel, I wanted to look into what factors contribute to the price of an Air Bnb. The four variables that chose to look at were HighBlack (greater than 60 % of the population in neighborhood is black), HighRev (Air Bnb has more than 100 reviews posted), accommodates (how many the Air Bnb can accommodate), and WalkScore (how "walkable" the neighborhood is). After fitting the full model, I wanted to see if the model could be reduced further. However, after comparing the full model to the additive model, the full model turned out to be better. However, when comparing the additive model to the even further-reduced model (resulting from backwards elimination), the further-reduced model turned out to be better. Therefore, after looking at the AIC and BIC of each model, I decided to keep the full model in hopes of not losing any variables that could potentially explain the estimated mean price. 
+* Given that my dad is always worried about the price of a hotel, I wanted to look into what factors contribute to the price of an Air Bnb. The four variables that I chose to look at were HighBlack (greater than 60 % of the population in neighborhood is black), HighRev (Air Bnb has more than 100 reviews posted), accommodates (how many the Air Bnb can accommodate), and WalkScore (how "walkable" the neighborhood is). After fitting the full model, I wanted to see if the model could be reduced further. However, after comparing the full model to the additive model, the full model turned out to be better. However, when comparing the additive model to the even further-reduced model (resulting from backwards elimination), the further-reduced model turned out to be better. Therefore, after looking at the AIC and BIC of each model, I decided to keep the full model in hopes of not losing any variables that could potentially explain the estimated mean price. 
 
