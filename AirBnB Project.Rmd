@@ -104,6 +104,7 @@ glimpse(AirBnb.data)
 # Research Question 1: What variables contribute to a customer's complete satisfaction with a hotel? 
 ### EDA
 As seen in the summary statistics, the mean bedrooms, number for people the unit accommodates, price, Walk score, Transit score, and Bike Score for being completely satisfied (satisfaction = 1) and not completely satsified (satisfaction = 0) are all very similar. The only one that looks significantly different is the price of the unit. After looking at the boxplots, the means for bedrooms, transit score, and bike score appear to be very similar and the means for number of people the unit accommodates, price, and walk score look different. Therefore, I will fit a logistic model to each of these variables to see if they are significant in predicting the odds of whether of not a customer is completely satisfied. 
+
 ```{r}
 AirBnb.data %>%
   group_by(satisfaction) %>%
